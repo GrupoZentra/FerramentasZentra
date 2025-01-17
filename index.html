@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dados da Planilha</h1>
+    <div id="table-container">
+        <p>Carregando dados...</p>
+    </div>
+
+    <script>
+        // ID da planilha e API key
+        const SPREADSHEET_ID = "1yru0R2VH3nL8u0npD4LewiDi6B4aprCE-TzaAq3Tcso";
+        const API_KEY = "AIzaSyDx3dgoaiZoAfOrdGhj2tFWdRhiQw8XHUU";
+        const RANGE = "A1:E10"; // Ajuste o intervalo conforme necessário
+
+        // URL da API para buscar os dados
+        const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
+        // Função para buscar dados da API e exibir na página
+        async function fetchData() {
+            try {
+                const response = await fetch(URL);
+                const data = await response.json();
+
+                if (data.values) {
+                    renderTable(data.values);
+                } else {
+                    document.getElementById("table-container").innerHTML = "<p>Erro: Não foi possível carregar os dados.</p>";
+                }
+            } catch (error) {
+                console.error("Erro ao buscar os dados:", error);
+                document.getElementById("table-container").innerHTML = "<p>Erro: Não foi possível carregar os dados.</p>";
+            }
+        }
+
+        // Função para renderizar os dados em uma tabela HTML
+        function renderTable(data) {
+            let tableHTML = "<table><thead><tr>";
+
+            // Cabeçalhos da tabela (primeira linha da planilha)
+            data[0].forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += "</tr></thead><tbody>";
+
+            // Linhas de dados (demais linhas da planilha)
+            data.slice(1).forEach(row => {
+                tableHTML += "<tr>";
+                row.forEach(cell => {
+                    tableHTML += `<td>${cell}</td>`;
+                });
+                tableHTML += "</tr>";
+            });
+
+            tableHTML += "</tbody></table>";
+            document.getElementById("table-container").innerHTML = tableHTML;
+        }
+
+        // Chamar a função para buscar e exibir os dados
+        fetchData();
+    </script>
+</body>
+</html>
